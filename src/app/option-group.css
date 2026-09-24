@@ -1,0 +1,198 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.option-group {
+  min-width: 0;
+  margin: 0 0 8px;
+  padding: 10px 14px 13px;
+  border: 1px solid #f1dfd1;
+  border-radius: 14px;
+  background: #fffbf6;
+  box-shadow: 0 2px 10px rgb(111 68 38 / 5%);
+}
+
+.option-group legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0;
+  color: #523724;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.option-grid {
+  display: grid;
+  clear: both;
+  grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+  gap: 8px;
+}
+
+.option-tile {
+  position: relative;
+  display: block;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.option-tile input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.option-content {
+  display: flex;
+  min-height: 86px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 5px 4px 6px;
+  border: 1px solid #e8d8cc;
+  border-radius: 11px;
+  background: #fffdfa;
+  color: #594230;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 2px 5px rgb(88 56 32 / 6%);
+  transition:
+    border-color 130ms ease,
+    background-color 130ms ease,
+    box-shadow 130ms ease,
+    transform 130ms ease;
+}
+
+.option-tile:hover .option-content {
+  border-color: #83aba7;
+  transform: translateY(-1px);
+}
+
+.option-tile input:checked + .option-content {
+  border-color: #268d94;
+  background: #f0fbfb;
+  box-shadow:
+    inset 0 0 0 1px #268d94,
+    0 2px 8px rgb(38 141 148 / 12%);
+  color: #244c49;
+}
+
+.option-tile input:focus-visible + .option-content {
+  outline: 3px solid #d97d69;
+  outline-offset: 2px;
+}
+
+.option-art-window {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: 80px;
+  height: 50px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.option-art {
+  position: absolute;
+  display: block;
+}
+
+.coat-art .option-art {
+  top: -4px;
+  left: 50%;
+  width: 118px;
+  height: 118px;
+  transform: translateX(-50%);
+}
+
+.face-art {
+  width: 98px;
+}
+
+.face-art .option-art {
+  top: -47px;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  transform: translateX(-50%);
+}
+
+.accessory-art {
+  width: 90px;
+}
+
+.accessory-art .option-art {
+  top: -91px;
+  left: 50%;
+  width: 190px;
+  height: 190px;
+  transform: translateX(-50%);
+}
+
+.bow-art .option-art {
+  top: -132px;
+  width: 240px;
+  height: 240px;
+}
+
+.glasses-art .option-art {
+  top: -58px;
+}
+
+.none-art .option-art {
+  top: 3px;
+  width: 44px;
+  height: 44px;
+}
+
+.background-art {
+  width: 100%;
+  height: 50px;
+  border-radius: 5px;
+  background: #f9db98;
+}
+
+.background-art .option-art {
+  top: 0;
+  left: 0;
+  width: 127%;
+  height: auto;
+  transform: translate(-10.5%, -5.4%) scaleY(0.47);
+  transform-origin: top left;
+}
+
+.sun-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 36px;
+  height: 36px;
+  transform: translate(-50%, -50%);
+}
+
+.option-label {
+  font-size: 12px;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 981px) and (max-width: 1150px) {
+  .option-label {
+    font-size: 11px;
+    letter-spacing: -0.02em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option-content {
+    transition: none;
+  }
+}

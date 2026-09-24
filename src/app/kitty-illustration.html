@@ -1,0 +1,10 @@
+<svg class="artwork" viewBox="0 0 512 512" role="img" [attr.aria-label]="accessibleLabel()">
+  <use [attr.href]="symbol('frame-polaroid')" />
+  <use [attr.href]="symbol('background-' + selection().background)" />
+  <use [attr.href]="symbol('coat-' + selection().coat)" />
+  <use [attr.href]="symbol('face-' + selection().face)" />
+  @if (selection().accessory) {
+    <use [attr.href]="symbol('accessory-' + selection().accessory)" />
+  }
+</svg>
+<span class="caption" aria-hidden="true">{{ name() }}</span>

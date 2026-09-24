@@ -1,0 +1,31 @@
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+
+.artwork {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.caption {
+  position: absolute;
+  top: 83.5%;
+  left: 12%;
+  display: flex;
+  width: 76%;
+  height: 13%;
+  align-items: center;
+  justify-content: center;
+  color: #765538;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(10px, 4.6cqw, 29px);
+  font-style: italic;
+  line-height: 1.06;
+  text-align: center;
+  overflow-wrap: anywhere;
+}

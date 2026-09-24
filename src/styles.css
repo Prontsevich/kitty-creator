@@ -1,1 +1,54 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #ffebde;
+  background-image:
+    url('/assets/paper-grain.svg'),
+    radial-gradient(ellipse 56% 64% at 50% 40%, rgb(255 249 239 / 72%), transparent 82%),
+    radial-gradient(ellipse 52% 68% at 4% 48%, rgb(255 208 178 / 68%), transparent 84%),
+    radial-gradient(ellipse 50% 66% at 96% 44%, rgb(255 217 190 / 60%), transparent 84%),
+    radial-gradient(ellipse 80% 54% at 50% 103%, rgb(255 219 197 / 43%), transparent 82%);
+  background-size:
+    256px 256px,
+    auto,
+    auto,
+    auto,
+    auto;
+  color: #4b3525;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+tui-root {
+  display: block;
+  min-height: 100vh;
+  --tui-background-base: #ffebde;
+  --tui-background-base-alt: #fffaf5;
+  --tui-background-accent-1: #3f7772;
+  --tui-background-accent-1-hover: #346a65;
+  --tui-background-accent-1-pressed: #2b5955;
+  --tui-text-primary: #4b3525;
+  --tui-text-secondary: #766451;
+  --tui-text-primary-on-accent-1: #fff;
+  --tui-border-normal: #dcc8b8;
+  --tui-radius-m: 0.8rem;
+  --tui-radius-l: 1.1rem;
+  --tui-typography-family-text: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --tui-typography-family-display: Georgia, 'Times New Roman', serif;
+}
