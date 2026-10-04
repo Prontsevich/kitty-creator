@@ -34,44 +34,6 @@
           Не удалось сохранить изменения Галереи. Они могут потеряться после перезагрузки.
         </div>
       }
-
-      <section class="gallery-section" aria-labelledby="gallery-title">
-        <div class="gallery-header">
-          <h2 id="gallery-title">Галерея</h2>
-          <button
-            tuiButton
-            appearance="flat"
-            size="s"
-            type="button"
-            class="clear-gallery-button"
-            aria-label="Очистить Галерею"
-            title="Очистить Галерею"
-            [disabled]="gallery.snapshots().length === 0"
-            (click)="clearGallery()"
-          >
-            <img src="/assets/trash-icon.svg" width="28" height="28" alt="" />
-          </button>
-        </div>
-
-        @if (gallery.snapshots().length === 0) {
-          <p class="gallery-empty">Здесь появится твой первый снимок.</p>
-        } @else {
-          <div
-            #galleryStrip
-            class="gallery-grid"
-            tabindex="0"
-            role="region"
-            aria-label="Сохранённые снимки"
-          >
-            @for (snapshot of gallery.snapshots(); track snapshot.id) {
-              <app-photo-card
-                [snapshot]="snapshot"
-                [class.just-captured]="snapshot.id === latestCaptureId()"
-              />
-            }
-          </div>
-        }
-      </section>
     </div>
 
     <div class="controls">
@@ -104,5 +66,43 @@
         (selectedChange)="setOption('background', $event)"
       />
     </div>
+  </section>
+
+  <section class="gallery-section" aria-labelledby="gallery-title">
+    <div class="gallery-header">
+      <h2 id="gallery-title">Галерея</h2>
+      <button
+        tuiButton
+        appearance="flat"
+        size="s"
+        type="button"
+        class="clear-gallery-button"
+        aria-label="Очистить Галерею"
+        title="Очистить Галерею"
+        [disabled]="gallery.snapshots().length === 0"
+        (click)="clearGallery()"
+      >
+        <img src="/assets/trash-icon.svg" width="28" height="28" alt="" />
+      </button>
+    </div>
+
+    @if (gallery.snapshots().length === 0) {
+      <p class="gallery-empty">Здесь появится твой первый снимок.</p>
+    } @else {
+      <div
+        #galleryStrip
+        class="gallery-grid"
+        tabindex="0"
+        role="region"
+        aria-label="Сохранённые снимки"
+      >
+        @for (snapshot of gallery.snapshots(); track snapshot.id) {
+          <app-photo-card
+            [snapshot]="snapshot"
+            [class.just-captured]="snapshot.id === latestCaptureId()"
+          />
+        }
+      </div>
+    }
   </section>
 </main>

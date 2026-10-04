@@ -5,8 +5,8 @@
 
 .option-group {
   min-width: 0;
-  margin: 0 0 8px;
-  padding: 8px 12px 10px;
+  margin: var(--option-group-margin, 0 0 8px);
+  padding: var(--option-group-padding, 8px 12px 10px);
   border: 1px solid #f1dfd1;
   border-radius: 14px;
   background: #fffbf6;
@@ -28,7 +28,7 @@
 .option-grid {
   display: grid;
   clear: both;
-  grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -181,14 +181,7 @@
 .option-label {
   font-size: 12px;
   line-height: 1.12;
-  overflow-wrap: anywhere;
-}
-
-@media (min-width: 981px) and (max-width: 1150px) {
-  .option-label {
-    font-size: 11px;
-    letter-spacing: -0.02em;
-  }
+  overflow-wrap: normal;
 }
 
 @media (prefers-reduced-motion: reduce) {
