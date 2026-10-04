@@ -25,6 +25,22 @@ describe('GalleryStore', () => {
     expect(store.snapshots()[0].selection.coat).toBe('cream');
   });
 
+  it('clears saved snapshots so they do not return after a reload', () => {
+    const store = new GalleryStore();
+    store.add('First', defaultSelection);
+    store.add('Second', defaultSelection);
+    store.clear();
+
+    expect(store.snapshots()).toEqual([]);
+    expect(localStorage.getItem(galleryStorageKey)).toBeNull();
+    expect(new GalleryStore().snapshots()).toEqual([]);
+
+    store.add('Fresh start', defaultSelection);
+    expect(new GalleryStore().snapshots().map((snapshot) => snapshot.name)).toEqual([
+      'Fresh start',
+    ]);
+  });
+
   it('keeps an in-memory gallery when storage is unavailable', () => {
     const storage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
     Object.defineProperty(globalThis, 'localStorage', {
@@ -39,6 +55,8 @@ describe('GalleryStore', () => {
       store.add('Miso', defaultSelection);
       expect(store.persistenceUnavailable()).toBe(true);
       expect(store.snapshots()).toHaveLength(1);
+      store.clear();
+      expect(store.snapshots()).toEqual([]);
     } finally {
       if (storage) Object.defineProperty(globalThis, 'localStorage', storage);
     }

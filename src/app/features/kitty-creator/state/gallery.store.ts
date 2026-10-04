@@ -36,6 +36,15 @@ export class GalleryStore {
     return snapshot;
   }
 
+  clear(): void {
+    this.snapshots.set([]);
+    try {
+      globalThis.localStorage.removeItem(galleryStorageKey);
+    } catch {
+      this.persistenceUnavailable.set(true);
+    }
+  }
+
   private restore(): void {
     let raw: string | null;
     try {

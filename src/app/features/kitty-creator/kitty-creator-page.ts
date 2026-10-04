@@ -1,4 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  ElementRef,
+  inject,
+  Injector,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TuiButton, TuiInput } from '@taiga-ui/core';
 import { TuiToast } from '@taiga-ui/kit';
@@ -23,7 +31,10 @@ import {
   styleUrl: './kitty-creator-page.css',
 })
 export class KittyCreatorPage {
+  private readonly injector = inject(Injector);
+  private readonly galleryStrip = viewChild<ElementRef<HTMLDivElement>>('galleryStrip');
   protected readonly gallery = inject(GalleryStore);
+  protected readonly latestCaptureId = signal<string | null>(null);
   protected readonly selection = signal<KittySelection>({ ...defaultSelection });
   protected readonly coats = coats;
   protected readonly faces = faces;
@@ -41,6 +52,23 @@ export class KittyCreatorPage {
   }
 
   protected capture(): void {
-    this.gallery.add(this.name, this.selection());
+    const snapshot = this.gallery.add(this.name, this.selection());
+    this.latestCaptureId.set(snapshot.id);
+    afterNextRender(
+      {
+        write: () => {
+          const strip = this.galleryStrip()?.nativeElement;
+          if (strip) strip.scrollLeft = 0;
+        },
+      },
+      { injector: this.injector },
+    );
+  }
+
+  protected clearGallery(): void {
+    if (window.confirm('Удалить все снимки из Галереи?')) {
+      this.gallery.clear();
+      this.latestCaptureId.set(null);
+    }
   }
 }
