@@ -6,7 +6,7 @@
 .option-group {
   min-width: 0;
   margin: 0 0 8px;
-  padding: 10px 14px 13px;
+  padding: 8px 12px 10px;
   border: 1px solid #f1dfd1;
   border-radius: 14px;
   background: #fffbf6;
@@ -16,11 +16,11 @@
 .option-group legend {
   float: left;
   width: 100%;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   padding: 0;
   color: #523724;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 21px;
+  font-size: 19px;
   font-weight: 600;
   line-height: 1.15;
 }
@@ -51,7 +51,7 @@
 
 .option-content {
   display: flex;
-  min-height: 86px;
+  min-height: 78px;
   flex-direction: column;
   align-items: center;
   justify-content: center;

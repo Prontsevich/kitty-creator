@@ -7,16 +7,53 @@
   </header>
 
   <section class="studio" aria-label="Конструктор котика">
-    <div class="preview-area">
-      <app-kitty-illustration [selection]="selection()" [name]="displayName" />
+    <div class="portrait-column">
+      <div class="preview-area">
+        <app-kitty-illustration [selection]="selection()" [name]="displayName" />
+      </div>
+
+      <div class="capture-row">
+        <tui-textfield tuiTextfieldSize="l" class="name-field">
+          <input tuiInput [(ngModel)]="name" maxlength="24" autocomplete="off" />
+          <label tuiLabel>Имя котика</label>
+        </tui-textfield>
+        <button
+          tuiButton
+          type="button"
+          class="capture-button"
+          aria-label="Сделать снимок"
+          title="Сделать снимок"
+          (click)="capture()"
+        >
+          <img src="/assets/camera-icon.svg" width="36" height="36" alt="" />
+        </button>
+      </div>
+
+      @if (gallery.persistenceUnavailable()) {
+        <div tuiToast class="storage-notice" role="status">
+          Снимки останутся только до перезагрузки страницы.
+        </div>
+      }
+
+      <section class="gallery-section" aria-labelledby="gallery-title">
+        <div class="gallery-header">
+          <h2 id="gallery-title">Галерея</h2>
+          <p>Твои сохранённые котики</p>
+        </div>
+
+        @if (gallery.snapshots().length === 0) {
+          <p class="gallery-empty">Здесь появится твой первый снимок.</p>
+        } @else {
+          <div class="gallery-grid" tabindex="0" role="region" aria-label="Сохранённые снимки">
+            @for (snapshot of gallery.snapshots(); track snapshot.id) {
+              <app-photo-card [snapshot]="snapshot" />
+            }
+          </div>
+        }
+      </section>
     </div>
 
     <div class="controls">
-      <div class="controls-intro">
-        <h2>Какой он сегодня?</h2>
-        <p>Сочетай детали — котик изменится сразу.</p>
-      </div>
-
       <app-option-group
         kind="coat"
         title="Окрас"
@@ -45,39 +82,6 @@
         [selected]="selection().background"
         (selectedChange)="setOption('background', $event)"
       />
-
-      <div class="capture-row">
-        <tui-textfield tuiTextfieldSize="l" class="name-field">
-          <input tuiInput [(ngModel)]="name" maxlength="24" autocomplete="off" />
-          <label tuiLabel>Имя котика</label>
-        </tui-textfield>
-        <button tuiButton type="button" class="capture-button" (click)="capture()">
-          Сделать снимок
-        </button>
-      </div>
-
-      @if (gallery.persistenceUnavailable()) {
-        <div tuiToast class="storage-notice" role="status">
-          Снимки останутся только до перезагрузки страницы.
-        </div>
-      }
     </div>
-  </section>
-
-  <section class="gallery-section" aria-labelledby="gallery-title">
-    <div class="gallery-header">
-      <h2 id="gallery-title">Галерея</h2>
-      <p>Твои сохранённые котики</p>
-    </div>
-
-    @if (gallery.snapshots().length === 0) {
-      <p class="gallery-empty">Здесь появится твой первый снимок.</p>
-    } @else {
-      <div class="gallery-grid">
-        @for (snapshot of gallery.snapshots(); track snapshot.id) {
-          <app-photo-card [snapshot]="snapshot" />
-        }
-      </div>
-    }
   </section>
 </main>

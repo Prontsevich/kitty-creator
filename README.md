@@ -52,4 +52,6 @@ this feature until another feature needs to reuse them.
 
 Every snapshot stores its name and selected coat, expression, accessory, and background. New snapshots appear first. The gallery is saved under `kitty-creator:snapshots:v1` in the current browser's `localStorage`. If storage is unavailable, snapshots remain usable until the page is reloaded and the app shows a notice.
 
+On desktop, the portrait, name field, camera button, and gallery share the left column, with options on the right. The portrait adapts to viewport height to keep the studio visible on laptop screens. The gallery uses a horizontal thumbnail strip so additional snapshots do not increase page height. On narrow screens, options follow the capture controls and the gallery appears below them.
+
 The preview and gallery cards compose the same symbols from `public/assets/kitty-creator/kitty-parts.svg`. The area outside the white photo card is transparent, and the cat layers deliberately cross the photo border without an extra white contour. The source sprite and its symbol contract are maintained in the adjacent `kitty-creator-assets` directory.
