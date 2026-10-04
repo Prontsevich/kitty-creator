@@ -4,6 +4,15 @@
       <h1>Создай своего котика</h1>
       <p>Выбирай детали, а потом сохрани котика на снимке.</p>
     </div>
+    <button
+      type="button"
+      class="theme-toggle"
+      [attr.aria-label]="theme() === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'"
+      [title]="theme() === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'"
+      (click)="toggleTheme()"
+    >
+      <span aria-hidden="true">{{ theme() === 'dark' ? '☀' : '☾' }}</span>
+    </button>
   </header>
 
   <section class="studio" aria-label="Конструктор котика">

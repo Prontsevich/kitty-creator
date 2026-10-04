@@ -1,7 +1,14 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="dark" tuiTheme="dark">
   <head>
     <meta charset="utf-8" />
+    <script>
+      try {
+        const theme = localStorage.getItem('kitty-creator:theme') === 'light' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.setAttribute('tuiTheme', theme);
+      } catch {}
+    </script>
     <title>Создай своего котика</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

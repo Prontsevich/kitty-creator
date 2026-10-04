@@ -48,6 +48,15 @@ All kitty creator functionality lives in `src/app/features/kitty-creator/`:
 Tests live alongside the code they cover. Components and state remain local to
 this feature until another feature needs to reuse them.
 
+## Appearance
+
+The app starts in dark mode. The header icon button switches between dark and light
+modes and saves the choice under `kitty-creator:theme` in `localStorage`.
+The saved theme is applied before Angular starts to avoid a light background flash.
+If storage is blocked, theme switching still works for the current session.
+Option tiles retain a light background for artwork contrast in both themes.
+Portrait artwork and captured photos keep their original colors in both themes.
+
 ## Data and assets
 
 Every snapshot stores its name and selected coat, expression, accessory, and background. New snapshots appear first, and capturing a snapshot scrolls the gallery back to the newest photo with a brief reveal animation. Reduced-motion preferences disable smooth scrolling and reveal animations. The Clear button asks for confirmation, then empties the gallery and removes its localStorage entry. The gallery is saved under `kitty-creator:snapshots:v1` in the current browser's `localStorage`. If storage is unavailable, the app keeps an in-memory gallery and shows a notice that changes may be lost after a reload.

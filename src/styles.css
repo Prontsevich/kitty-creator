@@ -1,8 +1,42 @@
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+  --page-background: #1c1d20;
+  --page-text: #e8ded4;
+  --heading-text: #f2e7dc;
+  --muted-text: #b6aaa0;
+  --panel-background: #25272b;
+  --tile-background: #2e3035;
+  --surface-border: #48464a;
+  --panel-border: #3d3e43;
+  --selected-background: #233e3e;
+  --selected-text: #c4eeea;
+  --selected-border: #69b8b5;
+  --focus-color: #e59b85;
+  --accent: #3f7772;
+  --accent-hover: #346a65;
+  --accent-pressed: #2b5955;
+  --page-image: radial-gradient(ellipse at 50% 0%, #29292d, transparent 75%);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: #ffebde;
-  background-image:
+  background-color: var(--page-background);
+  background-image: var(--page-image);
+  color: var(--page-text);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --page-background: #ffebde;
+  --page-text: #4b3525;
+  --heading-text: #48301f;
+  --muted-text: #806957;
+  --panel-background: #fffbf6;
+  --tile-background: #fffdfa;
+  --surface-border: #dcc8b8;
+  --panel-border: #f1dfd1;
+  --selected-background: #f0fbfb;
+  --selected-text: #244c49;
+  --selected-border: #268d94;
+  --focus-color: #d97d69;
+  --page-image:
     url('/assets/paper-grain.svg'),
     radial-gradient(ellipse 56% 64% at 50% 40%, rgb(255 249 239 / 72%), transparent 82%),
     radial-gradient(ellipse 52% 68% at 4% 48%, rgb(255 208 178 / 68%), transparent 84%),
@@ -14,7 +48,6 @@
     auto,
     auto,
     auto;
-  color: #4b3525;
 }
 
 * {
@@ -38,15 +71,15 @@ input {
 tui-root {
   display: block;
   min-height: 100vh;
-  --tui-background-base: #ffebde;
-  --tui-background-base-alt: #fffaf5;
-  --tui-background-accent-1: #3f7772;
-  --tui-background-accent-1-hover: #346a65;
-  --tui-background-accent-1-pressed: #2b5955;
-  --tui-text-primary: #4b3525;
-  --tui-text-secondary: #766451;
+  --tui-background-base: var(--page-background);
+  --tui-background-base-alt: var(--tile-background);
+  --tui-background-accent-1: var(--accent);
+  --tui-background-accent-1-hover: var(--accent-hover);
+  --tui-background-accent-1-pressed: var(--accent-pressed);
+  --tui-text-primary: var(--page-text);
+  --tui-text-secondary: var(--muted-text);
   --tui-text-primary-on-accent-1: #fff;
-  --tui-border-normal: #dcc8b8;
+  --tui-border-normal: var(--surface-border);
   --tui-radius-m: 0.8rem;
   --tui-radius-l: 1.1rem;
   --tui-typography-family-text: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

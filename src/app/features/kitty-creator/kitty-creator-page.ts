@@ -7,6 +7,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TuiButton, TuiInput } from '@taiga-ui/core';
 import { TuiToast } from '@taiga-ui/kit';
@@ -31,6 +32,38 @@ import {
   styleUrl: './kitty-creator-page.css',
 })
 export class KittyCreatorPage {
+  private readonly document = inject(DOCUMENT);
+  protected readonly theme = signal(this.readTheme());
+
+  private readTheme(): 'dark' | 'light' {
+    try {
+      return this.document.defaultView?.localStorage.getItem('kitty-creator:theme') === 'light'
+        ? 'light'
+        : 'dark';
+    } catch {
+      return 'dark';
+    }
+  }
+
+  constructor() {
+    this.applyTheme();
+  }
+
+  private applyTheme(): void {
+    this.document.documentElement.dataset['theme'] = this.theme();
+    this.document.documentElement.setAttribute('tuiTheme', this.theme());
+  }
+
+  protected toggleTheme(): void {
+    this.theme.update((theme) => (theme === 'dark' ? 'light' : 'dark'));
+    this.applyTheme();
+    try {
+      this.document.defaultView?.localStorage.setItem('kitty-creator:theme', this.theme());
+    } catch {
+      // Theme switching remains available when browser storage is blocked.
+    }
+  }
+
   private readonly injector = inject(Injector);
   private readonly galleryStrip = viewChild<ElementRef<HTMLDivElement>>('galleryStrip');
   protected readonly gallery = inject(GalleryStore);

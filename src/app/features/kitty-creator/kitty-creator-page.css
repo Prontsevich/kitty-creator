@@ -9,6 +9,8 @@
 }
 
 .page-header {
+  position: relative;
+  padding-inline: 48px;
   margin-bottom: 12px;
   text-align: center;
 }
@@ -22,14 +24,14 @@
 
 .page-header h1 {
   margin: 0;
-  color: #48301f;
+  color: var(--heading-text);
   font-size: clamp(34px, 3.5vw, 50px);
   line-height: 1.07;
 }
 
 .page-header p {
   margin: 8px 0 0;
-  color: #806957;
+  color: var(--muted-text);
   font-size: clamp(15px, 1.3vw, 18px);
   line-height: 1.45;
 }
@@ -90,7 +92,7 @@
 .gallery-section {
   margin-top: 6px;
   padding-top: 8px;
-  border-top: 1px solid #dbc6b4;
+  border-top: 1px solid var(--surface-border);
 }
 
 .gallery-header {
@@ -111,10 +113,10 @@
 .gallery-empty {
   margin: 0;
   padding: 28px 16px;
-  border: 1px dashed #d5bba5;
+  border: 1px dashed var(--surface-border);
   border-radius: 13px;
-  background: #fff8f1;
-  color: #806957;
+  background: var(--panel-background);
+  color: var(--muted-text);
   text-align: center;
 }
 
@@ -170,7 +172,7 @@
 }
 
 .gallery-grid:focus-visible {
-  outline: 3px solid #d97d69;
+  outline: 3px solid var(--focus-color);
   outline-offset: 3px;
 }
 
@@ -237,5 +239,50 @@
 
   .capture-button {
     min-height: 52px;
+  }
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--surface-border);
+  border-radius: 999px;
+  background: var(--panel-background);
+  color: var(--page-text);
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.theme-toggle:hover {
+  background: var(--tile-background);
+  border-color: var(--selected-border);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 3px;
+}
+
+.theme-toggle span {
+  font-size: 19px;
+  line-height: 1;
+}
+
+@media (max-width: 980px) {
+  .page-header {
+    padding-inline: 0;
+  }
+
+  .theme-toggle {
+    position: static;
+    margin-top: 10px;
   }
 }
