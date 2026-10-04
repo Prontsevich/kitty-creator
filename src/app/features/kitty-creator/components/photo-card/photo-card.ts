@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
-import { KittyIllustration } from './kitty-illustration';
-import { Snapshot } from './kitty.model';
+import { KittyIllustration } from '../kitty-illustration/kitty-illustration';
+import { Snapshot } from '../../model/kitty.model';
 
 @Component({
   selector: 'app-photo-card',

@@ -1,9 +1,9 @@
 import { provideTaiga } from '@taiga-ui/core';
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
-import { galleryStorageKey } from './gallery.store';
+import { galleryStorageKey } from './features/kitty-creator/state/gallery.store';
 
-describe('Kitty creator', () => {
+describe('App', () => {
   beforeAll(() => {
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
@@ -20,51 +20,21 @@ describe('Kitty creator', () => {
     });
   });
 
-  beforeEach(async () => {
-    localStorage.removeItem(galleryStorageKey);
+  beforeEach(() => localStorage.removeItem(galleryStorageKey));
+  afterEach(() => localStorage.removeItem(galleryStorageKey));
+
+  it('renders the kitty creator page inside the Taiga UI root', async () => {
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [provideTaiga()],
     }).compileComponents();
-  });
 
-  afterEach(() => localStorage.removeItem(galleryStorageKey));
-
-  it('updates the preview as options are selected', async () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
-
-    const ginger = fixture.nativeElement.querySelector(
-      'input[name="coat"][value="ginger"]',
-    ) as HTMLInputElement;
-    ginger.click();
     await fixture.whenStable();
 
-    const preview = fixture.nativeElement.querySelector('.preview-area svg') as SVGElement;
-    expect(preview.querySelector('use[href$="#coat-ginger"]')).not.toBeNull();
-    expect(preview.querySelector('use[href$="#coat-cream"]')).toBeNull();
-  });
-
-  it('keeps the captured name and choices when the preview changes', async () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-
-    const root = fixture.nativeElement as HTMLElement;
-    const name = root.querySelector('.name-field input') as HTMLInputElement;
-    name.value = 'Барсик';
-    name.dispatchEvent(new Event('input', { bubbles: true }));
-    await fixture.whenStable();
-
-    (root.querySelector('.capture-button') as HTMLButtonElement).click();
-    await fixture.whenStable();
-
-    (root.querySelector('input[name="coat"][value="ginger"]') as HTMLInputElement).click();
-    await fixture.whenStable();
-
-    const card = root.querySelector('.gallery-card') as HTMLElement;
-    expect(card.querySelector('.caption')?.textContent?.trim()).toBe('Барсик');
-    expect(card.querySelector('use[href$="#coat-cream"]')).not.toBeNull();
-    expect(card.querySelector('use[href$="#coat-ginger"]')).toBeNull();
-    expect(root.querySelector('.preview-area use[href$="#coat-ginger"]')).not.toBeNull();
+    const page = fixture.nativeElement.querySelector('tui-root app-kitty-creator-page');
+    expect(page).not.toBeNull();
+    expect(page.querySelector('h1')?.textContent).toContain('Создай своего котика');
   });
 });

@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { isSnapshot, KittySelection, Snapshot } from './kitty.model';
+import { isSnapshot, KittySelection, Snapshot } from '../model/kitty.model';
 
 export const galleryStorageKey = 'kitty-creator:snapshots:v1';
 

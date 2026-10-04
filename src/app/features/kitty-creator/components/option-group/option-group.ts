@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { kittySpriteUrl } from './kitty.model';
+import { kittySpriteUrl } from '../../model/kitty.model';
 
 interface Option {
   readonly id: string | null;

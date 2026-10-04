@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { KittySelection, kittySpriteUrl } from './kitty.model';
+import { KittySelection, kittySpriteUrl } from '../../model/kitty.model';
 
 @Component({
   selector: 'app-kitty-illustration',

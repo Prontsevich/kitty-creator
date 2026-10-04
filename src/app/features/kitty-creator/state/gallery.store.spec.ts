@@ -1,5 +1,5 @@
 import { GalleryStore, galleryStorageKey } from './gallery.store';
-import { defaultSelection } from './kitty.model';
+import { defaultSelection } from '../model/kitty.model';
 
 describe('GalleryStore', () => {
   beforeEach(() => localStorage.removeItem(galleryStorageKey));

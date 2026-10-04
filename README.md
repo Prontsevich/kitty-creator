@@ -29,6 +29,25 @@ npm run build
 
 The production output is written to `dist/kitty-creator/browser/`.
 
+## Project structure
+
+`src/app` contains the application shell (`App`) and application configuration.
+The shell provides `tui-root` and renders `KittyCreatorPage`.
+
+All kitty creator functionality lives in `src/app/features/kitty-creator/`:
+
+- `kitty-creator-page.*` assembles the screen and manages the current selection,
+  name, and capture action.
+- `components/` contains `kitty-illustration`, `option-group`, and `photo-card`.
+  Each component keeps its TypeScript, template, styles, and tests together;
+  small templates and styles may remain inline.
+- `model/kitty.model.ts` defines the available options, types, defaults, and
+  validation functions.
+- `state/gallery.store.*` manages gallery snapshots and localStorage persistence.
+
+Tests live alongside the code they cover. Components and state remain local to
+this feature until another feature needs to reuse them.
+
 ## Data and assets
 
 Every snapshot stores its name and selected coat, expression, accessory, and background. New snapshots appear first. The gallery is saved under `kitty-creator:snapshots:v1` in the current browser's `localStorage`. If storage is unavailable, snapshots remain usable until the page is reloaded and the app shows a notice.
