@@ -2,15 +2,6 @@ name: Deploy
 
 on:
   workflow_dispatch:
-    inputs:
-      ci_run_id:
-        description: Successful CI run ID from demo/random-kitty
-        required: true
-        type: string
-      commit_sha:
-        description: Full commit SHA verified by the selected CI run
-        required: true
-        type: string
 
 permissions:
   contents: read
@@ -27,6 +18,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       sha: ${{ steps.release.outputs.sha }}
+      run_id: ${{ steps.release.outputs.run_id }}
       artifact_id: ${{ steps.release.outputs.artifact_id }}
     steps:
       - name: Check out trusted deployment helpers
@@ -34,13 +26,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Verify CI run and release identity
+      - name: Find and verify CI for the selected branch commit
         id: release
         env:
           GH_TOKEN: ${{ github.token }}
-          CI_RUN_ID: ${{ inputs.ci_run_id }}
-          COMMIT_SHA: ${{ inputs.commit_sha }}
-        run: python3 scripts/resolve_ci_release.py "$CI_RUN_ID" "$COMMIT_SHA"
+        run: python3 scripts/resolve_ci_release.py
 
   deploy:
     needs: verify
@@ -61,7 +51,7 @@ jobs:
           artifact-ids: ${{ needs.verify.outputs.artifact_id }}
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
-          run-id: ${{ inputs.ci_run_id }}
+          run-id: ${{ needs.verify.outputs.run_id }}
           path: candidate
           merge-multiple: true
           digest-mismatch: error
@@ -69,7 +59,7 @@ jobs:
       - name: Verify archive and release metadata
         env:
           RELEASE_SHA: ${{ needs.verify.outputs.sha }}
-          CI_RUN_ID: ${{ inputs.ci_run_id }}
+          CI_RUN_ID: ${{ needs.verify.outputs.run_id }}
         run: |
           cd candidate
           sha256sum --check SHA256SUMS

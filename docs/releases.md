@@ -38,14 +38,16 @@ Runs created before artifact packaging was added cannot be promoted.
 
 1. Commit and push the workflow changes to `demo/random-kitty`.
 2. Open a successful **CI** run and review its commit and candidate artifact.
-3. Start **Deploy**, select `demo/random-kitty`, and supply its numeric CI run ID
-   and full commit SHA. Both values must refer to the same verified run.
+3. Start **Deploy**, select `demo/random-kitty`, and click **Run workflow**.
+   There are no release inputs to copy. The workflow captures the branch commit
+   at dispatch time and automatically finds its latest CI run. If that run is
+   unfinished or failed, deployment stops; it never falls back to an older commit
+   or an older successful run. Wait for CI or fix it, then start Deploy again.
 
-CLI equivalent (replace both placeholders):
+CLI equivalent:
 
 ```bash
-gh workflow run deploy.yml --ref demo/random-kitty \
-  -f ci_run_id=CI_RUN_ID -f commit_sha=FULL_COMMIT_SHA
+gh workflow run deploy.yml --ref demo/random-kitty
 ```
 
 The preflight job rejects failed or unfinished runs, another workflow/repository,
@@ -53,6 +55,8 @@ fork code, pull request events, another branch/commit, expired artifacts, and
 artifacts from a different run attempt. The deploy job downloads the exact artifact
 ID, verifies its digest, archive checksum, and release metadata, and does not rebuild.
 Starting this workflow deliberately publishes the selected version to the target.
+The run summary links to the chosen commit and CI run. Later pushes do not change
+the commit captured by this deployment request.
 
 The helper creates a new release directory, uploads files, switches `current`, and
 checks the public release marker plus HTML, JavaScript, and stylesheet availability.

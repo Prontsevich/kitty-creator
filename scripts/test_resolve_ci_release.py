@@ -3,7 +3,7 @@
 import copy
 import unittest
 
-from resolve_ci_release import select_artifact, validate_run
+from resolve_ci_release import select_artifact, select_run, validate_run
 
 
 class ReleaseGateTests(unittest.TestCase):
@@ -34,6 +34,27 @@ class ReleaseGateTests(unittest.TestCase):
     def test_accepts_successful_trusted_run_and_exact_artifact(self):
         validate_run(self.run, self.workflow, self.repository, self.sha)
         self.assertEqual(select_artifact(self.run, [self.artifact], self.sha)["id"], 30)
+
+    def test_selects_latest_run_for_exact_dispatch_commit(self):
+        old = dict(self.run, id=19)
+        another_commit = dict(self.run, id=21, head_sha="b" * 40)
+        self.assertEqual(select_run([old, another_commit, self.run], self.sha)["id"], 20)
+
+    def test_never_falls_back_to_another_commit(self):
+        with self.assertRaisesRegex(ValueError, "No CI run exists"):
+            select_run([dict(self.run, head_sha="b" * 40)], self.sha)
+
+    def test_rejects_pending_or_failed_latest_run_instead_of_older_success(self):
+        for changes, message in (
+            ({"status": "queued"}, "still running"),
+            ({"status": "in_progress"}, "still running"),
+            ({"conclusion": "failure"}, "did not succeed"),
+            ({"conclusion": "cancelled"}, "did not succeed"),
+        ):
+            with self.subTest(changes=changes):
+                latest = dict(self.run, id=21, **changes)
+                with self.assertRaisesRegex(ValueError, message):
+                    select_run([self.run, latest], self.sha)
 
     def test_rejects_failed_pending_wrong_branch_commit_event_or_workflow(self):
         for key, value in {

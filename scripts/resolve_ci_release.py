@@ -6,6 +6,19 @@ import os
 import re
 import subprocess
 import sys
+from urllib.parse import urlencode
+
+
+def select_run(runs, sha):
+    matches = [run for run in runs if run.get("head_sha") == sha]
+    if not matches:
+        raise ValueError("No CI run exists for this commit. Push the branch and wait for CI, then start Deploy again.")
+    run = max(matches, key=lambda item: item["id"])
+    if run.get("status") != "completed":
+        raise ValueError("CI for this commit is still running. Wait for CI, then start Deploy again.")
+    if run.get("conclusion") != "success":
+        raise ValueError("The latest CI run for this commit did not succeed. Fix or rerun CI before deploying.")
+    return run
 
 
 def validate_run(run, workflow, repository, sha):
@@ -47,19 +60,29 @@ def api(path, paginate=False):
 
 
 def main():
-    run_id, sha = sys.argv[1:]
-    if not re.fullmatch(r"[1-9][0-9]*", run_id):
-        raise ValueError("Expected a numeric CI run ID")
+    sha = os.environ["GITHUB_SHA"]
     if not re.fullmatch(r"[0-9a-f]{40}", sha):
         raise ValueError("Expected a full commit SHA")
     repository = os.environ["GITHUB_REPOSITORY"]
     workflow = api(f"repos/{repository}/actions/workflows/ci.yml")
+    query = urlencode({"branch": "demo/random-kitty", "event": "push", "head_sha": sha, "per_page": 100})
+    pages = api(f"repos/{repository}/actions/workflows/ci.yml/runs?{query}", True)
+    selected = select_run([item for page in pages for item in page["workflow_runs"]], sha)
+    run_id = selected["id"]
     run = api(f"repos/{repository}/actions/runs/{run_id}")
     validate_run(run, workflow, repository, sha)
     pages = api(f"repos/{repository}/actions/runs/{run_id}/artifacts?per_page=100", True)
     artifact = select_artifact(run, [item for page in pages for item in page["artifacts"]], sha)
     with open(os.environ["GITHUB_OUTPUT"], "a") as output:
-        output.write(f"sha={sha}\nartifact_id={artifact['id']}\n")
+        output.write(f"sha={sha}\nrun_id={run_id}\nartifact_id={artifact['id']}\n")
+    if os.environ.get("GITHUB_STEP_SUMMARY"):
+        with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+            summary.write(
+                "## Deployment candidate\n\n"
+                f"Commit: [{sha[:7]}](https://github.com/{repository}/commit/{sha})\n\n"
+                f"Verified [CI run](https://github.com/{repository}/actions/runs/{run_id}). "
+                "Deploy will publish this exact artifact without rebuilding.\n"
+            )
     print(f"Verified CI run {run_id}, commit {sha}, artifact {artifact['id']}")
 
 
