@@ -32,26 +32,27 @@ import {
   styleUrl: './kitty-creator-page.css',
 })
 export class KittyCreatorPage {
+  protected readonly gallery = inject(GalleryStore);
   private readonly document = inject(DOCUMENT);
-  protected readonly theme = signal(this.readTheme());
+  private readonly injector = inject(Injector);
 
-  private readTheme(): 'dark' | 'light' {
-    try {
-      return this.document.defaultView?.localStorage.getItem('kitty-creator:theme') === 'light'
-        ? 'light'
-        : 'dark';
-    } catch {
-      return 'dark';
-    }
+  protected readonly theme = signal(this.readTheme());
+  protected readonly latestCaptureId = signal<string | null>(null);
+  protected readonly selection = signal<KittySelection>({ ...defaultSelection });
+  protected readonly coats = coats;
+  protected readonly faces = faces;
+  protected readonly accessories = accessories;
+  protected readonly backgrounds = backgrounds;
+  protected name = 'Мой котик';
+
+  private readonly galleryStrip = viewChild<ElementRef<HTMLDivElement>>('galleryStrip');
+
+  protected get displayName(): string {
+    return this.name.trim() || 'Мой котик';
   }
 
   constructor() {
     this.applyTheme();
-  }
-
-  private applyTheme(): void {
-    this.document.documentElement.dataset['theme'] = this.theme();
-    this.document.documentElement.setAttribute('tuiTheme', this.theme());
   }
 
   protected toggleTheme(): void {
@@ -62,21 +63,6 @@ export class KittyCreatorPage {
     } catch {
       // Theme switching remains available when browser storage is blocked.
     }
-  }
-
-  private readonly injector = inject(Injector);
-  private readonly galleryStrip = viewChild<ElementRef<HTMLDivElement>>('galleryStrip');
-  protected readonly gallery = inject(GalleryStore);
-  protected readonly latestCaptureId = signal<string | null>(null);
-  protected readonly selection = signal<KittySelection>({ ...defaultSelection });
-  protected readonly coats = coats;
-  protected readonly faces = faces;
-  protected readonly accessories = accessories;
-  protected readonly backgrounds = backgrounds;
-  protected name = 'Мой котик';
-
-  protected get displayName(): string {
-    return this.name.trim() || 'Мой котик';
   }
 
   protected setOption(kind: keyof KittySelection, value: string | null): void {
@@ -105,6 +91,7 @@ export class KittyCreatorPage {
     }
 
     this.selection.set(next);
+    this.name = '';
   }
 
   protected capture(): void {
@@ -126,5 +113,20 @@ export class KittyCreatorPage {
       this.gallery.clear();
       this.latestCaptureId.set(null);
     }
+  }
+
+  private readTheme(): 'dark' | 'light' {
+    try {
+      return this.document.defaultView?.localStorage.getItem('kitty-creator:theme') === 'light'
+        ? 'light'
+        : 'dark';
+    } catch {
+      return 'dark';
+    }
+  }
+
+  private applyTheme(): void {
+    this.document.documentElement.dataset['theme'] = this.theme();
+    this.document.documentElement.setAttribute('tuiTheme', this.theme());
   }
 }
