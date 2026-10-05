@@ -91,7 +91,6 @@ export class KittyCreatorPage {
     }
 
     this.selection.set(next);
-    this.name = '';
   }
 
   protected capture(): void {
