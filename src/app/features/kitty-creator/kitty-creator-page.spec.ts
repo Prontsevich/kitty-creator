@@ -118,7 +118,7 @@ describe('KittyCreatorPage', () => {
     expect(root.querySelector('.preview-area use[href$="#coat-ginger"]')).not.toBeNull();
   });
 
-  it('randomizes all settings while preserving the name and gallery across repeated clicks', async () => {
+  it('randomizes all settings and clears the name while preserving the gallery across repeated clicks', async () => {
     const fixture = TestBed.createComponent(KittyCreatorPage);
     fixture.detectChanges();
     await fixture.whenStable();
@@ -142,6 +142,8 @@ describe('KittyCreatorPage', () => {
     await fixture.whenStable();
 
     const preview = root.querySelector('.preview-area') as HTMLElement;
+    expect(name.value).toBe('');
+    expect(preview.querySelector('.caption')?.textContent?.trim()).toBe('Мой котик');
     for (const symbol of [
       'coat-calico',
       'face-curious',
@@ -152,13 +154,16 @@ describe('KittyCreatorPage', () => {
     }
 
     for (const value of [0.999, 0, 0]) {
-      const before = preview.innerHTML;
+      name.value = 'Барсик';
+      name.dispatchEvent(new Event('input', { bubbles: true }));
+      await fixture.whenStable();
+      const before = preview.querySelector('svg')?.innerHTML;
       vi.mocked(Math.random).mockReturnValue(value);
       randomize.click();
       await fixture.whenStable();
-      expect(preview.innerHTML).not.toBe(before);
-      expect(name.value).toBe('Барсик');
-      expect(preview.querySelector('.caption')?.textContent?.trim()).toBe('Барсик');
+      expect(preview.querySelector('svg')?.innerHTML).not.toBe(before);
+      expect(name.value).toBe('');
+      expect(preview.querySelector('.caption')?.textContent?.trim()).toBe('Мой котик');
       expect(root.querySelectorAll('.gallery-card')).toHaveLength(1);
       expect(card.innerHTML).toBe(savedCard);
       expect(localStorage.getItem(galleryStorageKey)).toBe(savedGallery);
