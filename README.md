@@ -29,6 +29,43 @@ npm run build
 
 The production output is written to `dist/kitty-creator/browser/`.
 
+## CI/CD
+
+`.github/workflows/ci-cd.yml` runs only on pushes to `main`. The `ci` job
+installs locked dependencies, runs application tests and post-release helper
+tests, and creates the production build. It adds `release.json` with the commit
+SHA and uploads the build as an Actions artifact retained for seven days.
+Repository users with Actions artifact access can download this candidate;
+uploading it does not publish the site.
+
+After successful CI, the `deploy` job automatically downloads that same build
+and runs `scripts/deploy.sh`. There is no manual approval gate. Deployments use
+the `kitty-production` concurrency group without cancelling an active deploy.
+
+GitHub repository settings must contain:
+
+| Kind | Name | Purpose |
+| --- | --- | --- |
+| Secret | `SSH_PRIVATE_KEY` | Private key authorized on the VPS |
+| Variable | `SSH_HOST` | VPS hostname or IPv4 address |
+| Variable | `SSH_PORT` | SSH port |
+| Variable | `SSH_USER` | Deployment account |
+| Variable | `SSH_KNOWN_HOSTS` | Verified host key entry, including the port when non-default |
+
+The VPS must already have `/srv/www/kitty.s-pro.space/releases/` writable by the
+deployment account and serve `/srv/www/kitty.s-pro.space/current` at
+`https://kitty.s-pro.space`. SSH and rsync must be available to the runner and
+VPS. Deployment copies the build into `releases/<full-commit-sha>`, switches
+the `current` symlink, and checks the public release SHA, Angular HTML, JavaScript,
+and styles. A failed public check fails the job without automatically rolling back.
+
+An existing release directory is never overwritten, so rerunning deployment
+for the same commit fails. Choose a known-good full commit SHA for a deliberate
+rollback with `bash scripts/rollback.sh <full-commit-sha>` in an operator-controlled
+runner session with the same SSH variables and `RUNNER_TEMP` set. This restores
+the existing server release; it does not restore browser localStorage. Server
+release directories remain available independently of Actions artifact retention.
+
 ## Project structure
 
 `src/app` contains the application shell (`App`) and application configuration.

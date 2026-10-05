@@ -28,5 +28,53 @@ jobs:
       - name: Run tests
         run: npm run test:ci
 
+      - name: Test post-release checks
+        run: python3 scripts/test_public_release.py
+
       - name: Build
         run: npm run build
+
+      - name: Add release metadata
+        run: |
+          test -s dist/kitty-creator/browser/index.html
+          printf '{"release":"%s"}\n' "$GITHUB_SHA" > dist/kitty-creator/browser/release.json
+
+      - name: Upload verified build
+        uses: actions/upload-artifact@v7
+        with:
+          name: kitty-build-${{ github.sha }}
+          path: dist/kitty-creator/browser/
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    name: Deploy to VPS
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: kitty-production
+      cancel-in-progress: false
+    steps:
+      - name: Check out deployment scripts
+        uses: actions/checkout@v7
+
+      - name: Download verified build
+        uses: actions/download-artifact@v8
+        with:
+          name: kitty-build-${{ github.sha }}
+          path: build
+
+      - name: Deploy and verify public release
+        env:
+          SSH_HOST: ${{ vars.SSH_HOST }}
+          SSH_PORT: ${{ vars.SSH_PORT }}
+          SSH_USER: ${{ vars.SSH_USER }}
+          SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: bash scripts/deploy.sh "$GITHUB_SHA"
+
+      - name: Remove temporary SSH files
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/kitty-ssh"
