@@ -63,7 +63,7 @@
 
 .capture-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 12px;
   align-items: stretch;
   width: min(100%, 480px);
@@ -74,13 +74,15 @@
   min-width: 0;
 }
 
-.capture-button {
+.capture-button,
+.randomize-button {
   width: 56px;
   min-width: 56px;
   padding: 0;
 }
 
-.capture-button img {
+.capture-button img,
+.randomize-button img {
   display: block;
 }
 
@@ -237,7 +239,8 @@
     margin-top: 16px;
   }
 
-  .capture-button {
+  .capture-button,
+  .randomize-button {
     min-height: 52px;
   }
 }

@@ -29,6 +29,16 @@
         <button
           tuiButton
           type="button"
+          class="randomize-button"
+          aria-label="Создать случайного котика"
+          title="Создать случайного котика"
+          (click)="randomize()"
+        >
+          <img src="/assets/dice-icon.svg" width="36" height="36" alt="" />
+        </button>
+        <button
+          tuiButton
+          type="button"
           class="capture-button"
           aria-label="Сделать снимок"
           title="Сделать снимок"

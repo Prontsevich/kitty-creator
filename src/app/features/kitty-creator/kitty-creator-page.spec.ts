@@ -93,6 +93,79 @@ describe('KittyCreatorPage', () => {
     expect(preview.querySelector('use[href$="#coat-cream"]')).toBeNull();
   });
 
+  it('changes the kitty even when the random choices match the current settings', async () => {
+    const fixture = TestBed.createComponent(KittyCreatorPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const selectedOptions = () =>
+      Array.from(root.querySelectorAll<HTMLInputElement>('input[type="radio"]:checked')).map(
+        (input) => `${input.name}:${input.value}`,
+      );
+    const before = selectedOptions();
+    vi.spyOn(Math, 'random')
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0.25)
+      .mockReturnValueOnce(0)
+      .mockReturnValue(0);
+
+    (root.querySelector('.randomize-button') as HTMLButtonElement).click();
+    await fixture.whenStable();
+
+    expect(selectedOptions()).not.toEqual(before);
+    expect(selectedOptions()).toHaveLength(4);
+    expect(root.querySelector('.preview-area use[href$="#coat-ginger"]')).not.toBeNull();
+  });
+
+  it('randomizes all settings while preserving the name and gallery across repeated clicks', async () => {
+    const fixture = TestBed.createComponent(KittyCreatorPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const name = root.querySelector('.name-field input') as HTMLInputElement;
+    name.value = 'Барсик';
+    name.dispatchEvent(new Event('input', { bubbles: true }));
+    await fixture.whenStable();
+    (root.querySelector('.capture-button') as HTMLButtonElement).click();
+    await fixture.whenStable();
+    const savedGallery = localStorage.getItem(galleryStorageKey);
+    const card = root.querySelector('.gallery-card') as HTMLElement;
+    const savedCard = card.innerHTML;
+    const randomize = root.querySelector('.randomize-button') as HTMLButtonElement;
+    expect(randomize.previousElementSibling?.classList.contains('name-field')).toBe(true);
+    expect(randomize.nextElementSibling?.classList.contains('capture-button')).toBe(true);
+    expect(randomize.querySelector('img')?.getAttribute('src')).toBe('/assets/dice-icon.svg');
+    vi.spyOn(Math, 'random').mockReturnValue(0.999);
+
+    randomize.click();
+    await fixture.whenStable();
+
+    const preview = root.querySelector('.preview-area') as HTMLElement;
+    for (const symbol of [
+      'coat-calico',
+      'face-curious',
+      'accessory-glasses',
+      'background-sunset',
+    ]) {
+      expect(preview.querySelector(`use[href$="#${symbol}"]`)).not.toBeNull();
+    }
+
+    for (const value of [0.999, 0, 0]) {
+      const before = preview.innerHTML;
+      vi.mocked(Math.random).mockReturnValue(value);
+      randomize.click();
+      await fixture.whenStable();
+      expect(preview.innerHTML).not.toBe(before);
+      expect(name.value).toBe('Барсик');
+      expect(preview.querySelector('.caption')?.textContent?.trim()).toBe('Барсик');
+      expect(root.querySelectorAll('.gallery-card')).toHaveLength(1);
+      expect(card.innerHTML).toBe(savedCard);
+      expect(localStorage.getItem(galleryStorageKey)).toBe(savedGallery);
+    }
+    expect(preview.querySelector('use[href*="#accessory-"]')).toBeNull();
+  });
+
   it('keeps the captured name and choices when the preview changes', async () => {
     const fixture = TestBed.createComponent(KittyCreatorPage);
     fixture.detectChanges();
