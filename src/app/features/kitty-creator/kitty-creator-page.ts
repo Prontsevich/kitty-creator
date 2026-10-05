@@ -84,6 +84,29 @@ export class KittyCreatorPage {
     if (isKittySelection(next)) this.selection.set(next);
   }
 
+  protected randomize(): void {
+    const pick = <T>(options: readonly { id: T }[]): T =>
+      options[Math.floor(Math.random() * options.length)].id;
+    const current = this.selection();
+    const next: KittySelection = {
+      coat: pick(coats),
+      face: pick(faces),
+      accessory: pick(accessories),
+      background: pick(backgrounds),
+    };
+
+    if (
+      next.coat === current.coat &&
+      next.face === current.face &&
+      next.accessory === current.accessory &&
+      next.background === current.background
+    ) {
+      next.coat = pick(coats.filter((option) => option.id !== current.coat));
+    }
+
+    this.selection.set(next);
+  }
+
   protected capture(): void {
     const snapshot = this.gallery.add(this.name, this.selection());
     this.latestCaptureId.set(snapshot.id);

@@ -67,6 +67,10 @@ Portrait artwork and captured photos keep their original colors in both themes.
 
 ## Data and assets
 
+The Random Kitty button randomizes the coat, expression, accessory, and background.
+Every click changes at least one choice while preserving the entered name and all
+gallery snapshots.
+
 Every snapshot stores its name and selected coat, expression, accessory, and background. New snapshots appear first, and capturing a snapshot scrolls the gallery back to the newest photo with a brief reveal animation. Reduced-motion preferences disable smooth scrolling and reveal animations. The Clear button asks for confirmation, then empties the gallery and removes its localStorage entry. The gallery is saved under `kitty-creator:snapshots:v1` in the current browser's `localStorage`. If storage is unavailable, the app keeps an in-memory gallery and shows a notice that changes may be lost after a reload.
 
 On desktop, the portrait, name field, and camera button occupy the left column, with option groups in a two-by-two grid on the right. Each group's choices always use two columns, including on wide screens. On short desktop viewports, the header hides its helper text and panel spacing tightens to preserve tile and photo sizes. The gallery spans the full page width below the studio. The portrait adapts to viewport height to keep the studio visible on laptop screens. The gallery uses a horizontal thumbnail strip so additional snapshots do not increase page height. On narrow screens, options follow the capture controls and the gallery appears below them.
