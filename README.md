@@ -31,10 +31,11 @@ The production output is written to `dist/kitty-creator/browser/`.
 
 ## Delivery and rollback
 
-CI retains a verified build for manual delivery from `demo/random-kitty`.
-The Deploy and Rollback workflows use the existing SSH helpers and the `prod`
-Environment. See [release operations](docs/releases.md) for setup, candidate
-selection, manual commands, and recovery limitations.
+Every push to `demo/random-kitty` runs tests and a production build, then
+automatically deploys that verified build through the CI/CD workflow.
+Rollback remains a separate manual workflow. Both use the existing SSH helpers
+and the `prod` Environment. See [release operations](docs/releases.md) for setup
+and recovery limitations.
 
 ## Project structure
 
