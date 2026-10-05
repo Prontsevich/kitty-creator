@@ -61,10 +61,16 @@ and styles. A failed public check fails the job without automatically rolling ba
 
 An existing release directory is never overwritten, so rerunning deployment
 for the same commit fails. Choose a known-good full commit SHA for a deliberate
-rollback with `bash scripts/rollback.sh <full-commit-sha>` in an operator-controlled
-runner session with the same SSH variables and `RUNNER_TEMP` set. This restores
-the existing server release; it does not restore browser localStorage. Server
-release directories remain available independently of Actions artifact retention.
+rollback using `.github/workflows/rollback.yml`: open
+**Actions → Rollback → Run workflow**, select
+`main`, and enter the full lowercase 40-character SHA in `commit_sha`. Manual
+runs execute only the `rollback` job; other branches skip it. The job uses the
+same SSH settings and `kitty-production` concurrency group as deployment, runs
+`bash scripts/rollback.sh "$RELEASE_SHA"`, and checks the public release and
+assets. The selected `releases/<full-commit-sha>` directory must already exist
+on the VPS. This restores the existing server release; it does not restore
+browser localStorage. Server release directories remain available independently
+of Actions artifact retention.
 
 ## Project structure
 

@@ -1,0 +1,48 @@
+name: Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: Full 40-character commit SHA of a known-good release on the VPS
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  rollback:
+    name: Roll back production
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: kitty-production
+      cancel-in-progress: false
+    steps:
+      - name: Validate release SHA
+        env:
+          RELEASE_SHA: ${{ inputs.commit_sha }}
+        run: |
+          [[ "$RELEASE_SHA" =~ ^[0-9a-f]{40}$ ]] || {
+            echo 'Expected a full lowercase 40-character commit SHA' >&2
+            exit 2
+          }
+
+      - name: Check out rollback scripts
+        uses: actions/checkout@v7
+
+      - name: Restore and verify public release
+        env:
+          RELEASE_SHA: ${{ inputs.commit_sha }}
+          SSH_HOST: ${{ vars.SSH_HOST }}
+          SSH_PORT: ${{ vars.SSH_PORT }}
+          SSH_USER: ${{ vars.SSH_USER }}
+          SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: bash scripts/rollback.sh "$RELEASE_SHA"
+
+      - name: Remove temporary SSH files
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/kitty-ssh"
