@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  check:
+  ci:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -68,7 +68,7 @@ jobs:
           retention-days: 30
 
   deploy:
-    needs: check
+    needs: ci
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:
@@ -83,7 +83,7 @@ jobs:
       - name: Download the build verified by this run
         uses: actions/download-artifact@v8
         with:
-          artifact-ids: ${{ needs.check.outputs.artifact_id }}
+          artifact-ids: ${{ needs.ci.outputs.artifact_id }}
           path: candidate
           merge-multiple: true
           digest-mismatch: error
