@@ -1,0 +1,50 @@
+name: Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Full SHA of a known-good release already stored on the server
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kitty-prod
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    if: github.ref == 'refs/heads/demo/random-kitty'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: prod
+      url: https://kitty.s-pro.space
+    steps:
+      - name: Check out trusted rollback helpers
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Validate the selected release
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          [[ "$RELEASE_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo 'Expected a full commit SHA' >&2; exit 2; }
+
+      - name: Restore release and verify the public version
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: bash scripts/rollback.sh "$RELEASE_SHA"
+
+      - name: Remove temporary SSH credentials
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/kitty-ssh"

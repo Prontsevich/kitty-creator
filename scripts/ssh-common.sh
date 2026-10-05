@@ -39,4 +39,38 @@ if actual != sys.argv[2]:
     raise SystemExit(f'Expected release {sys.argv[2]}, received {actual}')
 print(f'Public release confirmed: {actual}')
 PY
+  curl --fail --silent --show-error --retry 3 --retry-delay 2 \
+    "https://kitty.s-pro.space/?run=${GITHUB_RUN_ID:-manual}" > "$RUNNER_TEMP/kitty-index.html"
+  python3 - "$RUNNER_TEMP/kitty-index.html" <<'PY'
+from html.parser import HTMLParser
+from pathlib import Path
+import subprocess, sys
+from urllib.parse import urljoin, urlparse
+
+class Page(HTMLParser):
+    app_root = False
+    scripts = []
+    styles = []
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == 'app-root':
+            self.app_root = True
+        if tag == 'script' and attrs.get('src'):
+            self.scripts.append(attrs['src'])
+        if tag == 'link' and attrs.get('rel') == 'stylesheet' and attrs.get('href'):
+            self.styles.append(attrs['href'])
+
+page = Page()
+page.feed(Path(sys.argv[1]).read_text())
+if not page.app_root or not page.scripts:
+    raise SystemExit('Public page does not contain the Angular app')
+for asset in page.scripts + page.styles:
+    url = urljoin('https://kitty.s-pro.space/', asset)
+    if urlparse(url).netloc != 'kitty.s-pro.space' or urlparse(url).scheme != 'https':
+        raise SystemExit('Unexpected public asset origin')
+    subprocess.run(['curl', '--fail', '--silent', '--show-error',
+                    '--output', '/dev/null', url], check=True)
+print('Public HTML, JavaScript and styles are reachable')
+PY
 }

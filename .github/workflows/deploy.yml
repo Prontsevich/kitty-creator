@@ -1,0 +1,106 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      ci_run_id:
+        description: Successful CI run ID from demo/random-kitty
+        required: true
+        type: string
+      commit_sha:
+        description: Full commit SHA verified by the selected CI run
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: kitty-prod
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/demo/random-kitty'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      sha: ${{ steps.release.outputs.sha }}
+      artifact_id: ${{ steps.release.outputs.artifact_id }}
+    steps:
+      - name: Check out trusted deployment helpers
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Verify CI run and release identity
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_RUN_ID: ${{ inputs.ci_run_id }}
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+        run: python3 scripts/resolve_ci_release.py "$CI_RUN_ID" "$COMMIT_SHA"
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: prod
+      url: https://kitty.s-pro.space
+    steps:
+      - name: Check out trusted deployment helpers
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Download the exact verified artifact
+        uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ needs.verify.outputs.artifact_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.ci_run_id }}
+          path: candidate
+          merge-multiple: true
+          digest-mismatch: error
+
+      - name: Verify archive and release metadata
+        env:
+          RELEASE_SHA: ${{ needs.verify.outputs.sha }}
+          CI_RUN_ID: ${{ inputs.ci_run_id }}
+        run: |
+          cd candidate
+          sha256sum --check SHA256SUMS
+          mkdir ../build
+          tar -xzf release.tar.gz -C ../build
+          cd ..
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          release = json.loads(Path("build/release.json").read_text())
+          expected = {
+              "release": os.environ["RELEASE_SHA"],
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "run_id": os.environ["CI_RUN_ID"],
+          }
+          if any(release.get(key) != value for key, value in expected.items()):
+              raise SystemExit("Release metadata does not match the selected CI run")
+          if not Path("build/index.html").is_file():
+              raise SystemExit("Release has no index.html")
+          PY
+
+      - name: Publish release and verify the public version
+        env:
+          RELEASE_SHA: ${{ needs.verify.outputs.sha }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: bash scripts/deploy.sh "$RELEASE_SHA"
+
+      - name: Remove temporary SSH credentials
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/kitty-ssh"

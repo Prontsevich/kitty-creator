@@ -29,6 +29,13 @@ npm run build
 
 The production output is written to `dist/kitty-creator/browser/`.
 
+## Delivery and rollback
+
+CI retains a verified build for manual delivery from `demo/random-kitty`.
+The Deploy and Rollback workflows use the existing SSH helpers and the `prod`
+Environment. See [release operations](docs/releases.md) for setup, candidate
+selection, manual commands, and recovery limitations.
+
 ## Project structure
 
 `src/app` contains the application shell (`App`) and application configuration.

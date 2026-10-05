@@ -28,3 +28,32 @@ jobs:
 
       - name: Build production app
         run: npm run build
+
+      - name: Test deployment identity checks
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts -p 'test_*.py'
+
+      - name: Package verified release
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          release = {
+              "release": os.environ["GITHUB_SHA"],
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+          }
+          Path("dist/kitty-creator/browser/release.json").write_text(json.dumps(release) + "\n")
+          PY
+          mkdir candidate
+          tar -czf candidate/release.tar.gz -C dist/kitty-creator/browser .
+          cd candidate
+          sha256sum release.tar.gz > SHA256SUMS
+
+      - name: Retain verified release for manual deployment
+        uses: actions/upload-artifact@v7
+        with:
+          name: kitty-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: candidate/
+          if-no-files-found: error
+          retention-days: 30
